@@ -81,3 +81,80 @@ def get_event_details(request, id):
     return Response(status=HTTP_403_FORBIDDEN)
 
 
+# delete event
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_event(request, id):
+    # only the owner of the event can delete the event
+    if request.method == 'POST':
+        event = get_object_or_404(Event, id=id)
+        if event.user == request.user:
+            event.delete()
+            return Response({"message": "Event deleted successfully."})
+        return Response(status=HTTP_403_FORBIDDEN)
+    return Response(status=HTTP_403_FORBIDDEN)
+
+# update event
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def update_event(request, id):
+    # only the owner of the event can update the event
+    if request.method == 'POST':
+        event = get_object_or_404(Event, id=id)
+        if event.user == request.user:
+            serializer = EventSerializer(event, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=HTTP_201_CREATED)
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+        return Response(status=HTTP_403_FORBIDDEN)
+    return Response(status=HTTP_403_FORBIDDEN)
+
+
+# update attendence
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def update_attendence(request, id):
+    # only the owner of the event can update the event
+    if request.method == 'POST':
+        attendence = get_object_or_404(Attendence, id=id)
+        if attendence.event.user == request.user:
+            serializer = AttendenceSerializer(attendence, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=HTTP_201_CREATED)
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+        return Response(status=HTTP_403_FORBIDDEN)
+
+    
+
+
+
+# delete attendence
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_attendence(request, id):
+    # only the owner of the event can delete the attendence
+    if request.method == 'POST':
+        attendence = get_object_or_404(Attendence, id=id)
+        if attendence.user == request.user:
+            attendence.delete()
+            return Response({"message": "Attendence deleted successfully."})
+        return Response(status=HTTP_403_FORBIDDEN)
+    return Response(status=HTTP_403_FORBIDDEN)
+
+
+# get all events for user who is logged in
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_all_events_of_user_logged(request):
+    if request.method == 'POST':
+        events = Event.objects.filter(user=request.user)
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data)
+    return Response(status=HTTP_403_FORBIDDEN)
