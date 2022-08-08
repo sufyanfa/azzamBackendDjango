@@ -4,6 +4,7 @@ from .serializers import EventSerializer, AttendenceSerializer
 from rest_framework.response import Response
 from rest_framework.request import Request
 import pandas as pd
+from django.core.validators import validate_email
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.status import HTTP_201_CREATED, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
@@ -31,6 +32,7 @@ def create_event(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def add_attendences(request):
+    valid_emails = 0
     if request.method == 'POST':
         event_id = request.data.get('event_id')
         event = Event.objects.get(id=event_id)
@@ -39,11 +41,22 @@ def add_attendences(request):
         for index, row in df.iterrows():
             name = row['name']
             email = row['email']
+            # check if email is null
             mobile = row['mobile']
             attendence = Attendence(
                 event=event, name=name, email=email, mobile=mobile)
             attendence.save()
-        return Response({"message": "Attendences added successfully."})
+
+        # check if email is valid
+        for index, row in df.iterrows():
+            email = row['email']
+            try:
+                validate_email(email)
+                valid_emails += 1
+            except:
+                pass
+        return Response({"message": "Attendences added successfully.", "valid_emails": valid_emails}, status=HTTP_201_CREATED)
+    return Response(status=HTTP_403_FORBIDDEN)
 
 
 
@@ -92,7 +105,8 @@ def delete_event(request, id):
         if event.user == request.user:
             event.delete()
             return Response({"message": "Event deleted successfully."})
-        return Response(status=HTTP_403_FORBIDDEN)
+        else:
+            return Response({"message": "You are not authorized to delete this event."})
     return Response(status=HTTP_403_FORBIDDEN)
 
 # update event
@@ -128,6 +142,7 @@ def update_attendence(request, id):
                 return Response(serializer.data, status=HTTP_201_CREATED)
             return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
         return Response(status=HTTP_403_FORBIDDEN)
+    return Response(status=HTTP_403_FORBIDDEN)
 
     
 
@@ -146,6 +161,24 @@ def delete_attendence(request, id):
             return Response({"message": "Attendence deleted successfully."})
         return Response(status=HTTP_403_FORBIDDEN)
     return Response(status=HTTP_403_FORBIDDEN)
+
+
+# delete all attendences of an event
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_all_attendences(request, id):
+    # only the owner of the event can delete the attendences
+    if request.method == 'POST':
+        event = get_object_or_404(Event, id=id)
+        if event.user == request.user:
+            attendences = Attendence.objects.filter(event=event)
+            attendences.delete()
+            return Response({"message": "Attendences deleted successfully."})
+        return Response(status=HTTP_403_FORBIDDEN)
+    return Response(status=HTTP_403_FORBIDDEN)
+
+
 
 
 # get all events for user who is logged in

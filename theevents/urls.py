@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import create_event, add_attendences, get_event_details, delete_event, update_attendence, get_all_events_of_user_logged
+from .views import create_event, add_attendences, get_event_details, delete_event, update_attendence, get_all_events_of_user_logged, delete_all_attendences, delete_attendence
 
 
 app_name = 'theevents'
@@ -11,4 +11,5 @@ urlpatterns = [
     path('delete-event/<id>/', delete_event, name='delete_event'),
     path('update-attendence/<id>/', update_attendence, name='update_attendence'),
     path('get-all-events-of-user-logged/', get_all_events_of_user_logged, name='get_all_events_of_user_logged'),
+    path('delete-all-attendences/<id>/', delete_all_attendences, name='delete_all_attendences'),
 ]
