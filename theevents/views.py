@@ -7,7 +7,7 @@ import pandas as pd
 from django.core.validators import validate_email
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.status import HTTP_201_CREATED, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -22,9 +22,9 @@ def create_event(request):
         serializer = EventSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=HTTP_201_CREATED)
-        return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
-    return Response(status=HTTP_403_FORBIDDEN)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 # add attendences
@@ -55,8 +55,8 @@ def add_attendences(request):
                 valid_emails += 1
             except:
                 pass
-        return Response({"message": "Attendences added successfully.", "valid_emails": valid_emails}, status=HTTP_201_CREATED)
-    return Response(status=HTTP_403_FORBIDDEN)
+        return Response({"message": "Attendences added successfully.", "valid_emails": valid_emails}, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 
@@ -81,17 +81,17 @@ def get_event_details(request, id):
         # count of attendees who have not attended
         count_attendees_have_not_attended = len(attendences.filter(is_attended=False))
 
-
-        return Response({
-            "event": serializer.data,
-            "attendences": serializer2.data,
+        statistics_dict = {
             "count": count,
             "count_attendees_will_attend": count_attendees_will_attend,
             "count_attendees_will_not_attend": count_attendees_will_not_attend,
             "count_attendees_have_attended": count_attendees_have_attended,
             "count_attendees_have_not_attended": count_attendees_have_not_attended
-        })
-    return Response(status=HTTP_403_FORBIDDEN)
+        }
+
+        return Response({"event": serializer.data, "attendences": serializer2.data, "statistics": statistics_dict}, status=status.HTTP_200_OK)
+
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 # delete event
@@ -104,10 +104,10 @@ def delete_event(request, id):
         event = get_object_or_404(Event, id=id)
         if event.user == request.user:
             event.delete()
-            return Response({"message": "Event deleted successfully."})
+            return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "You are not authorized to delete this event."})
-    return Response(status=HTTP_403_FORBIDDEN)
+            return Response({"message": "You are not authorized to delete this event."}, status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 # update event
 @api_view(['POST'])
@@ -121,10 +121,10 @@ def update_event(request, id):
             serializer = EventSerializer(event, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=HTTP_201_CREATED)
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
-        return Response(status=HTTP_403_FORBIDDEN)
-    return Response(status=HTTP_403_FORBIDDEN)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 # update attendence
@@ -139,10 +139,10 @@ def update_attendence(request, id):
             serializer = AttendenceSerializer(attendence, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=HTTP_201_CREATED)
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
-        return Response(status=HTTP_403_FORBIDDEN)
-    return Response(status=HTTP_403_FORBIDDEN)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     
 
@@ -159,8 +159,8 @@ def delete_attendence(request, id):
         if attendence.user == request.user:
             attendence.delete()
             return Response({"message": "Attendence deleted successfully."})
-        return Response(status=HTTP_403_FORBIDDEN)
-    return Response(status=HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 # delete all attendences of an event
@@ -174,9 +174,9 @@ def delete_all_attendences(request, id):
         if event.user == request.user:
             attendences = Attendence.objects.filter(event=event)
             attendences.delete()
-            return Response({"message": "Attendences deleted successfully."})
-        return Response(status=HTTP_403_FORBIDDEN)
-    return Response(status=HTTP_403_FORBIDDEN)
+            return Response({"message": "Attendences deleted successfully."}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 
@@ -190,4 +190,4 @@ def get_all_events_of_user_logged(request):
         events = Event.objects.filter(user=request.user)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
-    return Response(status=HTTP_403_FORBIDDEN)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
