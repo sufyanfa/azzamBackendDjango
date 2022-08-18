@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+.container {
+    @apply max-w-6xl px-4 mx-auto;
+}
+.nav__item--des{
+    @apply font-medium text-gray-100 hover:text-gray-200;
+}
+.nav__item--ph{
+    @apply font-medium text-gray-900 hover:text-gray-700
+}
+.hero__h1{
+    @apply mb-6 text-3xl md:text-6xl 2xl:text-6xl text-gray-100 font-bold;
+}
+.hero__p{
+    @apply mb-6 max-w-max py-2.5 font-semibold text-primary rounded-full;
+}
+
+.features__des{
+    @apply mt-2 mr-9 text-base text-gray-600;
+}
+.solution__h2{
+    @apply mb-6 font-bold text-7xl text-gray-900;
+}
+.solution__li{
+    @apply mb-4 flex items-center font-semibold text-gray-900;
+}
+.solution__p{
+    @apply mb-16 text-base text-gray-600;
+}
+.solution__svg{
+    @apply ml-2 w-6 h-6 text-primary;
+}
+.features__h2{
+    @apply text-3xl font-extrabold text-gray-900;
+}
+.features__p{
+    @apply mt-4 text-gray-600;
+}
+.features__title{
+    @apply mr-9 leading-6 font-medium text-gray-900;
+}
+.features__svg{
+    @apply absolute h-6 w-6 text-primary;
+}
+.contact__h2{
+    @apply text-3xl font-extrabold text-gray-200;
+}
+.contact__p{
+    @apply mt-4 text-gray-300;
+}
+.contact__copy{
+    @apply px-4 mx-auto lg:col-span-6 lg:flex lg:items-center lg:text-right;
+}
+.contact__element{
+    @apply rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary;
+}
+.contact__element--label{
+    @apply block font-medium text-gray-900;
+}
+.contact__element--input{
+    @apply block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0;
+}
+.contact__btn{
+    @apply flex w-full justify-center rounded-md border border-transparent bg-primary py-2 px-4 font-medium text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+.event__label{
+    @apply block text-sm font-medium text-gray-700
+}
+.event__input{
+@apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-secondary  focus:ring-secondary
+}
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@200;300;400;500;600;700&display=swap');
+@layer base {
+    html {
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+    }
+}
+@layer components {
+    .button__primary {
+        padding: .5rem 1rem;
+        color: #000;
+        background-color: #ABFA00;
+        cursor: pointer;
+        transition: transform .3s;
+        border: 0;
+        border-radius: .15rem;
+        outline: none;
+        font-weight: 400;
+    }
+    .button__primary:hover {
+        transform: translate(-6px, -6px);
+    }
+    .button__secondary {
+        padding: .5rem 1rem;
+        color: #fff;
+        background-color: #4F00FA;
+        cursor: pointer;
+        transition: transform .3s;
+        border: 0;
+        border-radius: .15rem;
+        outline: none;
+        font-weight: 400;
+    }
+    .button__secondary:hover {
+        transform: translate(-6px, -6px);
+    }
+    
+}
