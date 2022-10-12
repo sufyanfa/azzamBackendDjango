@@ -1,1 +1,1 @@
-web: gunicorn project.wsgi --log-file -
+web: python azzambg/manage.py runserver 0.0.0.0:$PORT
